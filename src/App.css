@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+
+.completedTodo {
+  text-decoration: line-through;
+}
+
+.filters {
+  padding: 10px 0
+}
