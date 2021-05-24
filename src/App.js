@@ -5,6 +5,7 @@ class App extends React.Component {
   state = {
     todo: "",
     todoList: [],
+    option: 0,
   };
 
   onChangeTodo = (event) => {
@@ -12,10 +13,11 @@ class App extends React.Component {
   };
 
   onAddTodo = () => {
+    const len = this.state.todoList.length;
     this.setState({
       todoList: [
         ...this.state.todoList,
-        { todo: this.state.todo, complete: false },
+        { todo: this.state.todo, complete: false, index: len }
       ],
       todo: "",
     });
@@ -32,7 +34,33 @@ class App extends React.Component {
     this.setState({ todoList: newTodoList });
   };
 
+
   render() {
+    const handleClick = (index) => {
+      const curArr = this.state.todoList;
+      delete curArr[index];
+      this.setState({todoList: curArr});
+    }
+
+    const handleCopy = (items) => {
+      const curArr = this.state.todoList;
+      items.index = this.state.todoList.length;
+      curArr.push(items);
+      this.setState({todoList: curArr});
+    }
+
+    const handleShowAll = () => {
+      this.setState({option : 0});
+    }
+
+    const handleShowCompleted = () => {
+      this.setState({option : 1});
+    }
+
+    const handleShowPending = () => {
+      this.setState({option : 2});
+    }
+
     return (
       <div className="">
         <h3>Todo App</h3>
@@ -46,24 +74,41 @@ class App extends React.Component {
         </div>
         <div className="filters">
           Filters:
-          <button>Show All</button>
-          <button>Show Completed</button>
-          <button>Show Pending</button>
+          <button onClick = {() => {handleShowAll()}}>Show All</button>
+          <button onClick={() => {handleShowCompleted()}}>Show Completed</button>
+          <button onClick = {() => {handleShowPending()}}>Show Pending</button>
         </div>
         <ul>
           {this.state.todoList.map((item, index) => {
-            return (
-              <li className={item.complete ? "completedTodo" : ""}>
-                <input
-                  type="checkbox"
-                  checked={item.complete}
-                  onChange={() => this.onCompleted(index)}
-                />
-                <span>{item.todo}</span>
-                <button>Delete Todo</button>
-                <button>Copy Todo</button>
-              </li>
-            );
+            console.log(item);
+            if(item.complete && (this.state.option === 0 || this.state.option === 1)) {
+              return (
+                <li className={item.complete ? "completedTodo" : ""} key={index}>
+                  <input
+                    type="checkbox"
+                    checked={item.complete}
+                    onChange={() => {this.onCompleted(index)}}
+                  />
+                  <span>{item.todo}</span>
+                  <button onClick={() => handleClick(item.index)}>Delete Todo</button>
+                  <button onClick = {() => handleCopy(item)}>Copy Todo</button>
+                </li>
+              );
+            }
+            else if(!item.complete && (this.state.option === 0 || this.state.option === 2)) {
+              return (
+                <li className={item.complete ? "completedTodo" : ""} key={index}>
+                  <input
+                    type="checkbox"
+                    checked={item.complete}
+                    onChange={() => {this.onCompleted(index)}}
+                  />
+                  <span>{item.todo}</span>
+                  <button onClick={() => handleClick(item.index)}>Delete Todo</button>
+                  <button onClick = {() => handleCopy(item)}>Copy Todo</button>
+                </li>
+              );
+            }
           })}
         </ul>
       </div>
